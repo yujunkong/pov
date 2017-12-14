@@ -1,0 +1,355 @@
+
+RGB_blinky.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         000001c4  00000000  00000000  00000074  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .bss          00000096  00800100  00800100  00000238  2**0
+                  ALLOC
+  2 .stab         00000750  00000000  00000000  00000238  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  3 .stabstr      0000084d  00000000  00000000  00000988  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 34 00 	jmp	0x68	; 0x68 <__ctors_end>
+   4:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+   8:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+   c:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+  10:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+  14:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+  18:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+  1c:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+  20:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+  24:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+  28:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+  2c:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+  30:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+  34:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+  38:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+  3c:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+  40:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+  44:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+  48:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+  4c:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+  50:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+  54:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+  58:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+  5c:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+  60:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+  64:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+
+00000068 <__ctors_end>:
+  68:	11 24       	eor	r1, r1
+  6a:	1f be       	out	0x3f, r1	; 63
+  6c:	cf ef       	ldi	r28, 0xFF	; 255
+  6e:	d8 e0       	ldi	r29, 0x08	; 8
+  70:	de bf       	out	0x3e, r29	; 62
+  72:	cd bf       	out	0x3d, r28	; 61
+
+00000074 <__do_clear_bss>:
+  74:	11 e0       	ldi	r17, 0x01	; 1
+  76:	a0 e0       	ldi	r26, 0x00	; 0
+  78:	b1 e0       	ldi	r27, 0x01	; 1
+  7a:	01 c0       	rjmp	.+2      	; 0x7e <.do_clear_bss_start>
+
+0000007c <.do_clear_bss_loop>:
+  7c:	1d 92       	st	X+, r1
+
+0000007e <.do_clear_bss_start>:
+  7e:	a6 39       	cpi	r26, 0x96	; 150
+  80:	b1 07       	cpc	r27, r17
+  82:	e1 f7       	brne	.-8      	; 0x7c <.do_clear_bss_loop>
+  84:	0e 94 48 00 	call	0x90	; 0x90 <main>
+  88:	0c 94 e0 00 	jmp	0x1c0	; 0x1c0 <_exit>
+
+0000008c <__bad_interrupt>:
+  8c:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+00000090 <main>:
+#include <avr/interrupt.h>
+#include "light_apa102.h"
+
+struct cRGB led[50];
+
+int main(void) {
+  90:	ff 92       	push	r15
+  92:	0f 93       	push	r16
+  94:	1f 93       	push	r17
+  96:	cf 93       	push	r28
+  98:	df 93       	push	r29
+  9a:	c0 e0       	ldi	r28, 0x00	; 0
+  9c:	d0 e0       	ldi	r29, 0x00	; 0
+
+	while (1) {
+		for (int i = 0; i < 50; i++) {
+			led[i].r = 0;
+			led[i].g = 255;
+  9e:	ff 24       	eor	r15, r15
+  a0:	fa 94       	dec	r15
+    milliseconds can be achieved.
+ */
+void
+_delay_loop_2(uint16_t __count)
+{
+	__asm__ volatile (
+  a2:	00 e4       	ldi	r16, 0x40	; 64
+  a4:	1c e9       	ldi	r17, 0x9C	; 156
+
+int main(void) {
+
+	while (1) {
+		for (int i = 0; i < 50; i++) {
+			led[i].r = 0;
+  a6:	fe 01       	movw	r30, r28
+  a8:	ee 0f       	add	r30, r30
+  aa:	ff 1f       	adc	r31, r31
+  ac:	ec 0f       	add	r30, r28
+  ae:	fd 1f       	adc	r31, r29
+  b0:	e0 50       	subi	r30, 0x00	; 0
+  b2:	ff 4f       	sbci	r31, 0xFF	; 255
+  b4:	12 82       	std	Z+2, r1	; 0x02
+			led[i].g = 255;
+  b6:	f1 82       	std	Z+1, r15	; 0x01
+			led[i].b = 0;    // Write red to array
+  b8:	10 82       	st	Z, r1
+			apa102_setleds(led, 50);
+  ba:	80 e0       	ldi	r24, 0x00	; 0
+  bc:	91 e0       	ldi	r25, 0x01	; 1
+  be:	62 e3       	ldi	r22, 0x32	; 50
+  c0:	70 e0       	ldi	r23, 0x00	; 0
+  c2:	0e 94 dc 00 	call	0x1b8	; 0x1b8 <apa102_setleds>
+  c6:	c8 01       	movw	r24, r16
+  c8:	01 97       	sbiw	r24, 0x01	; 1
+  ca:	f1 f7       	brne	.-4      	; 0xc8 <main+0x38>
+struct cRGB led[50];
+
+int main(void) {
+
+	while (1) {
+		for (int i = 0; i < 50; i++) {
+  cc:	21 96       	adiw	r28, 0x01	; 1
+  ce:	c2 33       	cpi	r28, 0x32	; 50
+  d0:	d1 05       	cpc	r29, r1
+  d2:	4c f3       	brlt	.-46     	; 0xa6 <main+0x16>
+  d4:	c0 e0       	ldi	r28, 0x00	; 0
+  d6:	d0 e0       	ldi	r29, 0x00	; 0
+  d8:	e6 cf       	rjmp	.-52     	; 0xa6 <main+0x16>
+
+000000da <SPI_write>:
+  apa102_DDRREG  |=  _BV(apa102_clk);
+  apa102_PORTREG &= ~_BV(apa102_clk);  // initial state of clk is low
+}
+
+// Assumed state before call: SCK- Low, MOSI- High
+void SPI_write(uint8_t c) {
+  da:	90 e0       	ldi	r25, 0x00	; 0
+  uint8_t i;
+  for (i=0; i<8 ;i++)
+  {
+    if (!(c&0x80)) {
+  dc:	87 fd       	sbrc	r24, 7
+  de:	02 c0       	rjmp	.+4      	; 0xe4 <SPI_write+0xa>
+      apa102_PORTREG &= ~_BV(apa102_data); // set data low
+  e0:	28 98       	cbi	0x05, 0	; 5
+  e2:	01 c0       	rjmp	.+2      	; 0xe6 <SPI_write+0xc>
+    } else {
+      apa102_PORTREG |=  _BV(apa102_data); // set data high
+  e4:	28 9a       	sbi	0x05, 0	; 5
+    }
+
+  apa102_PORTREG |= (1<< apa102_clk); // SCK hi , data sampled here
+  e6:	2a 9a       	sbi	0x05, 2	; 5
+
+  c<<=1;
+
+  nop();  // Stretch clock
+  e8:	00 00       	nop
+  nop();
+  ea:	00 00       	nop
+
+  apa102_PORTREG &= ~_BV(apa102_clk); // clk low
+  ec:	2a 98       	cbi	0x05, 2	; 5
+}
+
+// Assumed state before call: SCK- Low, MOSI- High
+void SPI_write(uint8_t c) {
+  uint8_t i;
+  for (i=0; i<8 ;i++)
+  ee:	9f 5f       	subi	r25, 0xFF	; 255
+  f0:	98 30       	cpi	r25, 0x08	; 8
+  f2:	11 f0       	breq	.+4      	; 0xf8 <SPI_write+0x1e>
+      apa102_PORTREG |=  _BV(apa102_data); // set data high
+    }
+
+  apa102_PORTREG |= (1<< apa102_clk); // SCK hi , data sampled here
+
+  c<<=1;
+  f4:	88 0f       	add	r24, r24
+  f6:	f2 cf       	rjmp	.-28     	; 0xdc <SPI_write+0x2>
+  f8:	08 95       	ret
+
+000000fa <apa102_setleds_brightness>:
+{
+  apa102_setleds_brightness(ledarray,leds,1);
+}
+
+void inline apa102_setleds_brightness(struct cRGB *ledarray, uint16_t leds,uint8_t brightness)
+{
+  fa:	bf 92       	push	r11
+  fc:	cf 92       	push	r12
+  fe:	df 92       	push	r13
+ 100:	ef 92       	push	r14
+ 102:	ff 92       	push	r15
+ 104:	0f 93       	push	r16
+ 106:	1f 93       	push	r17
+ 108:	cf 93       	push	r28
+ 10a:	df 93       	push	r29
+ 10c:	18 2f       	mov	r17, r24
+ 10e:	09 2f       	mov	r16, r25
+ 110:	6b 01       	movw	r12, r22
+ 112:	b4 2e       	mov	r11, r20
+  bad cabling. If you want more speed, you should adapt this code to use
+  hardware SPI.
+*/
+
+inline void SPI_init(void) {
+  apa102_DDRREG  |=  _BV(apa102_data);
+ 114:	20 9a       	sbi	0x04, 0	; 4
+  apa102_DDRREG  |=  _BV(apa102_clk);
+ 116:	22 9a       	sbi	0x04, 2	; 4
+  apa102_PORTREG &= ~_BV(apa102_clk);  // initial state of clk is low
+ 118:	2a 98       	cbi	0x05, 2	; 5
+{
+  uint16_t i;
+  uint8_t *rawarray=(uint8_t*)ledarray;
+  SPI_init();
+
+  SPI_write(0x00);  // Start Frame
+ 11a:	80 e0       	ldi	r24, 0x00	; 0
+ 11c:	0e 94 6d 00 	call	0xda	; 0xda <SPI_write>
+  SPI_write(0x00);
+ 120:	80 e0       	ldi	r24, 0x00	; 0
+ 122:	0e 94 6d 00 	call	0xda	; 0xda <SPI_write>
+  SPI_write(0x00);
+ 126:	80 e0       	ldi	r24, 0x00	; 0
+ 128:	0e 94 6d 00 	call	0xda	; 0xda <SPI_write>
+  SPI_write(0x00);
+ 12c:	80 e0       	ldi	r24, 0x00	; 0
+ 12e:	0e 94 6d 00 	call	0xda	; 0xda <SPI_write>
+ 132:	21 2f       	mov	r18, r17
+ 134:	30 2f       	mov	r19, r16
+ 136:	c9 01       	movw	r24, r18
+ 138:	ec 01       	movw	r28, r24
+ 13a:	ee 24       	eor	r14, r14
+ 13c:	ff 24       	eor	r15, r15
+
+  for (i=0; i<(leds+leds+leds); i+=3)
+ 13e:	86 01       	movw	r16, r12
+ 140:	00 0f       	add	r16, r16
+ 142:	11 1f       	adc	r17, r17
+ 144:	0c 0d       	add	r16, r12
+ 146:	1d 1d       	adc	r17, r13
+  {
+    SPI_write(0xe0+brightness);  // Maximum global brightness
+ 148:	80 ee       	ldi	r24, 0xE0	; 224
+ 14a:	b8 0e       	add	r11, r24
+ 14c:	11 c0       	rjmp	.+34     	; 0x170 <apa102_setleds_brightness+0x76>
+ 14e:	8b 2d       	mov	r24, r11
+ 150:	0e 94 6d 00 	call	0xda	; 0xda <SPI_write>
+    SPI_write(rawarray[i+0]);
+ 154:	88 81       	ld	r24, Y
+ 156:	0e 94 6d 00 	call	0xda	; 0xda <SPI_write>
+    SPI_write(rawarray[i+1]);
+ 15a:	89 81       	ldd	r24, Y+1	; 0x01
+ 15c:	0e 94 6d 00 	call	0xda	; 0xda <SPI_write>
+    SPI_write(rawarray[i+2]);
+ 160:	8a 81       	ldd	r24, Y+2	; 0x02
+ 162:	0e 94 6d 00 	call	0xda	; 0xda <SPI_write>
+  SPI_write(0x00);  // Start Frame
+  SPI_write(0x00);
+  SPI_write(0x00);
+  SPI_write(0x00);
+
+  for (i=0; i<(leds+leds+leds); i+=3)
+ 166:	83 e0       	ldi	r24, 0x03	; 3
+ 168:	90 e0       	ldi	r25, 0x00	; 0
+ 16a:	e8 0e       	add	r14, r24
+ 16c:	f9 1e       	adc	r15, r25
+ 16e:	23 96       	adiw	r28, 0x03	; 3
+ 170:	e0 16       	cp	r14, r16
+ 172:	f1 06       	cpc	r15, r17
+ 174:	60 f3       	brcs	.-40     	; 0x14e <apa102_setleds_brightness+0x54>
+    SPI_write(rawarray[i+1]);
+    SPI_write(rawarray[i+2]);
+  }
+
+  // Reset frame - Only needed for SK9822, has no effect on APA102
+  SPI_write(0x00);
+ 176:	80 e0       	ldi	r24, 0x00	; 0
+ 178:	0e 94 6d 00 	call	0xda	; 0xda <SPI_write>
+  SPI_write(0x00);
+ 17c:	80 e0       	ldi	r24, 0x00	; 0
+ 17e:	0e 94 6d 00 	call	0xda	; 0xda <SPI_write>
+  SPI_write(0x00);
+ 182:	80 e0       	ldi	r24, 0x00	; 0
+ 184:	0e 94 6d 00 	call	0xda	; 0xda <SPI_write>
+  SPI_write(0x00);
+ 188:	80 e0       	ldi	r24, 0x00	; 0
+ 18a:	0e 94 6d 00 	call	0xda	; 0xda <SPI_write>
+ 18e:	00 e0       	ldi	r16, 0x00	; 0
+ 190:	10 e0       	ldi	r17, 0x00	; 0
+ 192:	05 c0       	rjmp	.+10     	; 0x19e <apa102_setleds_brightness+0xa4>
+
+  // End frame: 8+8*(leds >> 4) clock cycles
+  for (i=0; i<leds; i+=16)
+  {
+    SPI_write(0x00);  // 8 more clock cycles
+ 194:	80 e0       	ldi	r24, 0x00	; 0
+ 196:	0e 94 6d 00 	call	0xda	; 0xda <SPI_write>
+  SPI_write(0x00);
+  SPI_write(0x00);
+  SPI_write(0x00);
+
+  // End frame: 8+8*(leds >> 4) clock cycles
+  for (i=0; i<leds; i+=16)
+ 19a:	00 5f       	subi	r16, 0xF0	; 240
+ 19c:	1f 4f       	sbci	r17, 0xFF	; 255
+ 19e:	0c 15       	cp	r16, r12
+ 1a0:	1d 05       	cpc	r17, r13
+ 1a2:	c0 f3       	brcs	.-16     	; 0x194 <apa102_setleds_brightness+0x9a>
+  {
+    SPI_write(0x00);  // 8 more clock cycles
+  }
+}
+ 1a4:	df 91       	pop	r29
+ 1a6:	cf 91       	pop	r28
+ 1a8:	1f 91       	pop	r17
+ 1aa:	0f 91       	pop	r16
+ 1ac:	ff 90       	pop	r15
+ 1ae:	ef 90       	pop	r14
+ 1b0:	df 90       	pop	r13
+ 1b2:	cf 90       	pop	r12
+ 1b4:	bf 90       	pop	r11
+ 1b6:	08 95       	ret
+
+000001b8 <apa102_setleds>:
+// State after call: SCK Low, Dat high
+}
+
+void inline apa102_setleds(struct cRGB *ledarray, uint16_t leds)
+{
+  apa102_setleds_brightness(ledarray,leds,1);
+ 1b8:	41 e0       	ldi	r20, 0x01	; 1
+ 1ba:	0e 94 7d 00 	call	0xfa	; 0xfa <apa102_setleds_brightness>
+}
+ 1be:	08 95       	ret
+
+000001c0 <_exit>:
+ 1c0:	f8 94       	cli
+
+000001c2 <__stop_program>:
+ 1c2:	ff cf       	rjmp	.-2      	; 0x1c2 <__stop_program>
