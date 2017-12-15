@@ -10,31 +10,44 @@
 #include <avr/interrupt.h>
 
 #include "uart.h"
+#include "shift_register.h"
 
-// 7 segments
-#define cSegmentPortDir		DDRD // ¸ÅÅ©·Î »ó¼ö Á¤ÀÇ
-#define cSegmentPortData	PORTD
+static uint8_t Number0[5] = { 0x0, 0xF8, 0x88, 0xF8, 0x0, }; // ì”ìƒ ìˆ«ì ì„¤ì •
+static uint8_t Number1[5] = { 0x0, 0x48, 0xF8, 0x08, 0x0, };
+static uint8_t Number2[5] = { 0x0, 0xB8, 0xA8, 0xE8, 0x0, };
+static uint8_t Number3[5] = { 0x0, 0xA8, 0xA8, 0xF8, 0x0, };
+static uint8_t Number4[5] = { 0x0, 0xE0, 0x20, 0xF8, 0x20, };
+static uint8_t Number5[5] = { 0x0, 0xE8, 0xA8, 0xB8, 0x0, };
+static uint8_t Number6[5] = { 0x0, 0xF8, 0xA8, 0xB8, 0x0, };
+static uint8_t Number7[5] = { 0x0, 0xC0, 0x80, 0xF8, 0x0, };
+static uint8_t Number8[5] = { 0x0, 0xF8, 0xA8, 0xF8, 0x0, };
+static uint8_t Number9[5] = { 0x0, 0xE8, 0xA8, 0xF8, 0x0, };
+static uint8_t NumberC[5] = { 0x0, 0x0, 0x50, 0x0, 0x0, }; // :
+volatile char str[3]; //  ì „ì—­ë³€ìˆ˜ ì„ ì–¸
+volatile char time[7]; // ì‹œê°„ê°’
+volatile char key_input;
 
-char str[3]; //  Àü¿ªº¯¼ö ¼±¾ğ
-char time[7];
+void Shift_Resister_Write(uint8_t *Number) {
+	for (uint8_t i = 0; i < 5; i++) {
+		HC595Write(Number[i]);   //Write the data to HC595
+	}
+}
 
-char key_input;
-
-void GetString(void) {
+void GetString(void) {  // ì‹œê°„ì„¤ì •ì„ ìœ„í•´ ë¬¸ìì—´ì„ ë°›ëŠ” í•¨ìˆ˜
 	unsigned char i = 0;
 	unsigned char temp = 0;
 
-	do {
-		key_input = getchar();
-		printf("%c", key_input);
-		str[i] = key_input;
+	do { // ë¬´ì¡°ê±´ í•œë²ˆì€ ì‹¤í–‰
+		key_input = getchar(); // ì…ë ¥ë°›ì€ ê°’ì„ key_inputì— ì €ì¥
+		printf("%c", key_input); // ì…ë ¥ë°›ì€ ê°’ ì¶œë ¥
+		str[i] = key_input; // ì…ë ¥ë°›ì€ ê°’ ë°°ì—´ì— ì €ì¥
 		i++; // -> Skip ?
-		if (i >= 2)
+		if (i >= 2) // ë‘ ê°œì˜ ì…ë ¥ì´ ë°›ì•„ì¡Œìœ¼ë©´ ë°˜ë³µë¬¸ ì¢…ë£Œ
 			break;
-	} while (key_input != 0x0D);  // Enter  getchÀÇ °æ¿ì 0x0D(¹öÆÛ¸¦ »ç¿ëÇÏÁö ¾ÊÀ½) 0x0A??
+	} while (key_input != 0x0D);  // Enterê°’ì´ ë“¤ì–´ì˜¤ë©´ ë°˜ë³µë¬¸ ì¢…ë£Œ
 	printf("\n");
 
-	if (str[1] == 0x0D) {
+	if (str[1] == 0x0D) { // Enter ê°’ì´ ë“¤ì–´ì˜¤ë©´ ìˆœì„œë¥¼ ë°”ê¿” ì‹œê°„ í˜•ì‹ì— ë§ì¶°ì¤Œ
 		temp = str[0];
 		str[1] = temp;
 		str[0] = 0x30;
@@ -45,20 +58,22 @@ void GetString(void) {
 int Clock_Setting(void) {
 
 	do {
-		printf("Enter Hour : ");
+		printf("Enter Hour : "); // ì‹œê°„ ì„¤ì •
 		GetString();
-		time[0] = str[0];
+		time[0] = str[0]; // ë°›ì•„ì˜¨ ê°’ì„ ë°°ì—´ì˜ ì‹œê°„ ë¶€ë¶„ì— ì €ì¥
 		time[1] = str[1];
 	} while (time[0] < 0x30 || time[0] > 0x32 || time[1] < 0x30
-			|| time[1] > 0x39 || (time[0]==0x32 && time[1]>0x33) );
+			|| time[1] > 0x39 || (time[0] == 0x32 && time[1] > 0x33));
+	// ì‹œê°„ ë¶€ë¶„ì´ 00~23 ì™¸ì— ê°’ì´ ë“¤ì–´ì˜¬ ê²½ìš° ë°˜ë³µ
 
 	do {
-		printf("Enter Minute : ");
+		printf("Enter Minute : "); // ë¶„ ì„¤ì •
 		GetString();
 		time[2] = str[0];
 		time[3] = str[1];
 	} while (time[2] < 0x30 || time[2] > 0x35 || time[3] < 0x30
 			|| time[3] > 0x39);
+	// ë¶„ ë¶€ë¶„ì´ 00~59 ì™¸ì— ê°’ì´ ë“¤ì–´ì˜¬ ê²½ìš° ë°˜ë³µ
 
 	do {
 		printf("Enter Second : ");
@@ -67,32 +82,25 @@ int Clock_Setting(void) {
 		time[5] = str[1];
 	} while (time[4] < 0x30 || time[4] > 0x35 || time[5] < 0x30
 			|| time[5] > 0x39);
+	// ì´ˆ ë¶€ë¶„ì´ 00~59 ì™¸ì— ê°’ì´ ë“¤ì–´ì˜¬ ê²½ìš° ë°˜ë³µ
 
-	printf("if you want to reset press 'r' : ");
+	printf("if you want to reset, press 'r' : ");
 	key_input = getchar();
 	printf("%c\n", key_input);
-	if (key_input == 'r')  // ÀÔ·Â¹ŞÀº °ªÀÌ qÀÏ °æ¿ì ½ÇÇà
-		return 0; // 1 ¹İÈ¯
+	if (key_input == 'r')  // ì…ë ¥ë°›ì€ ê°’ì´ rì¼ ê²½ìš° ì‹¤í–‰
+		return 0; // 1 ë°˜í™˜
 	else
-		return 1;
-	return 0; // 0 ¹İÈ¯
+		return 1; // ì…ë ¥ë°›ì€ ê°’ì´ rì´ ì•„ë‹ ê²½ìš° 0 ë°˜í™˜
+	return 0; // 0 ë°˜í™˜
 }
 
 int POV_Globe_LED(void) {
-
-	printf("Enter your number [press 'q' to upper menu]: ");
-	key_input = getchar(); // ÀÔ·Â ¹ŞÀº °ªÀ» key_input º¯¼ö¿¡ ÀúÀå
-	printf("%c\n", key_input); // ÀÔ·Â¹ŞÀº °ª Ãâ·Â
-	_delay_ms(200);
-	if (key_input == 'q') { // ÀÔ·Â¹ŞÀº °ªÀÌ qÀÏ °æ¿ì ½ÇÇà
-		puts("Goodbye ADC\n");
-		return 1; // 1 ¹İÈ¯
-	}
-	return 0; // 0 ¹İÈ¯
+ // ì‘ì„± ì¤‘
+	return 1;
 }
 
 void menu(void) {
-	puts("\n==================="); // ¹®ÀÚ¿­ Ãâ·Â (ÀÚµ¿À¸·Î ÁÙ¹Ù²Ş)
+	puts("\n==================="); // ë¬¸ìì—´ ì¶œë ¥ (ìë™ìœ¼ë¡œ ì¤„ë°”ê¿ˆ)
 	puts("     Main Menu     ");
 	puts("-------------------");
 	puts("1. Clock Setting");
@@ -101,39 +109,36 @@ void menu(void) {
 }
 
 int main(void) {
-	uart_init(9600UL); // UART Åë½Å ÃÊ±âÈ­ (9600bps)
+	uart_init(9600UL); // UART í†µì‹  ì´ˆê¸°í™” (9600bps)
+	HC595Init(); //Initialize HC595 system
 
-	cSegmentPortDir &= 0xF0; // Æ÷Æ®D ÇÏÀ§ 4ºñÆ® ÀÔ·ÂÀ¸·Î ¼³Á¤ (¸¶½ºÅ© ¿¬»ê)
-	cSegmentPortData = 0x4 << 4;
-	// Æ÷Æ®D »óÀ§ 4ºñÆ® 1111 (7-segmentÀÇ LED Off)
-
-	stdout = &uart_output; // Ç¥ÁØ Ãâ·Â ¼³Á¤ (printf ÇÔ¼ö·Î ½Ã¸®¾ó Æ÷Æ® ÄÜ¼Ö¿¡ Ãâ·Â)
-	stdin = &uart_input; // Ç¥ÁØ ÀÔ·Â ¼³Á¤ (scanf ÇÔ¼ö·Î ½Ã¸®¾ó Æ÷Æ® ÄÜ¼Ö¿¡¼­ ÀÔ·Â)
+	stdout = &uart_output; // í‘œì¤€ ì¶œë ¥ ì„¤ì • (printf í•¨ìˆ˜ë¡œ ì‹œë¦¬ì–¼ í¬íŠ¸ ì½˜ì†”ì— ì¶œë ¥)
+	stdin = &uart_input; // í‘œì¤€ ì…ë ¥ ì„¤ì • (scanf í•¨ìˆ˜ë¡œ ì‹œë¦¬ì–¼ í¬íŠ¸ ì½˜ì†”ì—ì„œ ì…ë ¥)
 
 	printf("Hello POV LED!");
-	while (1) { // ¹«ÇÑ ¹İº¹¹® ½ÇÇà
-		menu(); // menu ÇÔ¼ö È£Ãâ
+	while (1) { // ë¬´í•œ ë°˜ë³µë¬¸ ì‹¤í–‰
+		menu(); // menu í•¨ìˆ˜ í˜¸ì¶œ
 		printf("Choose menu : ");
-		key_input = uart_getch(); // ÀÔ·Â ¹ŞÀº °ªÀ» key_input º¯¼ö¿¡ ÀúÀå
-		printf("%c\n", key_input); // ÀÔ·Â ¹ŞÀº °ª Ãâ·Â
+		key_input = uart_getch(); // ì…ë ¥ ë°›ì€ ê°’ì„ key_input ë³€ìˆ˜ì— ì €ì¥
+		printf("%c\n", key_input); // ì…ë ¥ ë°›ì€ ê°’ ì¶œë ¥
 		switch (key_input) {
-		case '1': // key_input °ªÀÌ 1ÀÏ °æ¿ì ½ÇÇà
-			while (!Clock_Setting()){}
-			printf("Time : ");
-			puts(time);
-				;
+		case '1': // key_input ê°’ì´ 1ì¼ ê²½ìš° ì‹¤í–‰
+			while (!Clock_Setting()) { // Clock_Setting í•¨ìˆ˜ì˜ return ê°’ì´ 0ì¼ ê²½ìš° ê³„ì† ë°˜ë³µ
+			}
+			printf("Time : %.2s:%.2s:%2s",time, &time[2], &time[4]); // ì„¤ì •ëœ ì‹œê°„ ì¶œë ¥
+			;
 			break;
-		case '2': // key_input °ªÀÌ 2ÀÏ °æ¿ì ½ÇÇà
-			while (!POV_Globe_LED())
+		case '2': // key_input ê°’ì´ 2ì¼ ê²½ìš° ì‹¤í–‰
+			while (!POV_Globe_LED()) // POV_Globe_LED í•¨ìˆ˜ì˜ return ê°’ì´ 0ì¼ ê²½ìš° ê³„ì† ë°˜ë³µ
 				;
 			break;
 		case 'q':
-			// key_input °ªÀÌ qÀÏ °æ¿ì break¸¦ ¸¸³¯ ¶§±îÁö ¸ğµç ¹®ÀåµéÀ» ½ÇÇà
-		case 'Q': // key_input °ªÀÌ QÀÏ °æ¿ì ½ÇÇà
+			// key_input ê°’ì´ qì¼ ê²½ìš° breakë¥¼ ë§Œë‚  ë•Œê¹Œì§€ ëª¨ë“  ë¬¸ì¥ë“¤ì„ ì‹¤í–‰
+		case 'Q': // key_input ê°’ì´ Qì¼ ê²½ìš° ì‹¤í–‰
 			puts("\nGood Main\n");
-			return 0; //  main ÇÔ¼ö Á¾·á
-		default: // key_input °ªÀÌ ¸¸Á·ÇÏ´Â Á¤¼ö°ªÀÌ ¾øÀ» °æ¿ì ½ÇÇà
-			printf("\n"); // ÁÙ¹Ù²Ş
+			return 0; //  main í•¨ìˆ˜ ì¢…ë£Œ
+		default: // key_input ê°’ì´ ë§Œì¡±í•˜ëŠ” ì •ìˆ˜ê°’ì´ ì—†ì„ ê²½ìš° ì‹¤í–‰
+			printf("\n"); // ì¤„ë°”ê¿ˆ
 		}
 	}
 	return 0;
