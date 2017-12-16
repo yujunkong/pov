@@ -27,6 +27,11 @@ volatile char str[3]; //  전역변수 선언
 volatile char time[7]; // 시간값
 volatile char key_input;
 
+void ClearInputBuffer(void) // 입력 버퍼를 비워주는 함수
+{
+	while(getchar() != '\n');
+}
+
 void Shift_Resister_Write(uint8_t *Number) {
 	for (uint8_t i = 0; i < 5; i++) {
 		HC595Write(Number[i]);   //Write the data to HC595
@@ -60,6 +65,7 @@ int Clock_Setting(void) {
 	do {
 		printf("Enter Hour : "); // 시간 설정
 		GetString();
+		ClearInputBuffer();
 		time[0] = str[0]; // 받아온 값을 배열의 시간 부분에 저장
 		time[1] = str[1];
 	} while (time[0] < 0x30 || time[0] > 0x32 || time[1] < 0x30
@@ -69,6 +75,7 @@ int Clock_Setting(void) {
 	do {
 		printf("Enter Minute : "); // 분 설정
 		GetString();
+		ClearInputBuffer();
 		time[2] = str[0];
 		time[3] = str[1];
 	} while (time[2] < 0x30 || time[2] > 0x35 || time[3] < 0x30
@@ -78,6 +85,7 @@ int Clock_Setting(void) {
 	do {
 		printf("Enter Second : ");
 		GetString();
+		ClearInputBuffer();
 		time[4] = str[0];
 		time[5] = str[1];
 	} while (time[4] < 0x30 || time[4] > 0x35 || time[5] < 0x30
@@ -86,6 +94,7 @@ int Clock_Setting(void) {
 
 	printf("if you want to reset, press 'r' : ");
 	key_input = getchar();
+	ClearInputBuffer();
 	printf("%c\n", key_input);
 	if (key_input == 'r')  // 입력받은 값이 r일 경우 실행
 		return 0; // 1 반환
@@ -120,6 +129,7 @@ int main(void) {
 		menu(); // menu 함수 호출
 		printf("Choose menu : ");
 		key_input = uart_getch(); // 입력 받은 값을 key_input 변수에 저장
+		ClearInputBuffer();
 		printf("%c\n", key_input); // 입력 받은 값 출력
 		switch (key_input) {
 		case '1': // key_input 값이 1일 경우 실행
